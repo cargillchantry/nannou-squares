@@ -1,0 +1,8 @@
+[package]
+name = "testing"
+version = "0.1.0"
+authors = ["Chantry Cargill <chantry.cargill@bjss.com>"]
+edition = "2018"
+
+[dependencies]
+nannou = "0.9"
