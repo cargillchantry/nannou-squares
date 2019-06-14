@@ -54,11 +54,11 @@ impl ModelBuilder {
         self
     }
     fn build(&mut self, _window: WindowId, app: &App) -> Model {
-        let rect_width = match self.rect_width { Some(x) => x, None => 25.0 };
-        let rect_height = match self.rect_width { Some(x) => x, None => 25.0 };
+        let rect_width = *self.rect_width.get_or_insert(25.0);
+        let rect_height = *self.rect_height.get_or_insert(25.0);
         Model {
             _window,
-            rectangles: (0..match self.number_rects { Some(x) => x, None => 5 }).map(|x| Rectangle {
+            rectangles: (0..*self.number_rects.get_or_insert(5)).map(|x| Rectangle {
                 x: random_range(0.0, app.window_rect().w()),
                 y: random_range(0.0, app.window_rect().h()),
                 max_x: app.window_rect().w() as f32 - rect_width,
@@ -87,7 +87,7 @@ fn model(app: &App) -> Model {
         .view(view)
         .build()
         .unwrap();
-    
+
     ModelBuilder::new()
         .with_rect_height(20.0)
         .with_rect_width(20.0)
