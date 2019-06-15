@@ -1,63 +1,17 @@
-use nannou::prelude::{App, Frame, Update, PURPLE, WindowId, random_range};
+use nannou::prelude::{App, Frame, Update, PURPLE};
 use nannou::LoopMode;
 use std::time::Duration;
-use crate::rectangle::{Direction, Rectangle, Move};
+use crate::model::Model;
+use crate::movement::Move;
 
 mod rectangle;
 mod movement;
+mod model;
 
 fn main() {
     nannou::app(model).update(update).run();
 }
 
-#[derive(Debug)]
-struct Model {
-    _window: WindowId,
-    rectangles: Vec<Rectangle>
-}
-
-impl Model {
-    fn builder() -> ModelBuilder {
-        ModelBuilder::new()
-    }
-}
-
-struct ModelBuilder {
-    rect_height: Option<f32>,
-    rect_width: Option<f32>,
-    number_rects: Option<u16>
-}
-
-impl ModelBuilder {
-    fn new() -> ModelBuilder {
-        Self { rect_height: None, rect_width: None, number_rects: None }
-    }
-    fn with_rect_width(mut self, width: f32) -> ModelBuilder {
-        self.rect_width = Some(width);
-        self
-    }
-    fn with_rect_height(mut self, height: f32) -> ModelBuilder {
-        self.rect_height = Some(height);
-        self
-    }
-    fn with_number_rects(mut self, number_rects: u16) -> ModelBuilder {
-        self.number_rects = Some(number_rects);
-        self
-    }
-    fn build(self, _window: WindowId, app: &App) -> Model {
-        Model {
-            _window,
-            rectangles: (0..self.number_rects.unwrap_or(5)).map(
-                |count| Rectangle::builder()
-                    .with_x(random_range(0.0, app.window_rect().w()))
-                    .with_y(random_range(0.0, app.window_rect().h()))
-                    .with_x_direction(match count % 4 { 0 | 1 => Direction::POSITIVE, _ => Direction::NEGATIVE})
-                    .with_y_direction(match count % 4 { 0 | 2 => Direction::POSITIVE, _ => Direction::NEGATIVE})
-                    .build(app)
-            ).collect()
-        }
-    }
-}
 
 fn model(app: &App) -> Model {
     app.set_loop_mode(LoopMode::Rate { update_interval: Duration::from_millis(10)});
