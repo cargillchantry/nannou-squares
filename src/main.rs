@@ -1,29 +1,15 @@
 use nannou::prelude::{App, Frame, Update, PURPLE, WindowId, random_range, Hsla};
 use nannou::LoopMode;
 use std::time::Duration;
+use crate::rectangle::{Direction, Rectangle, Move};
+
+mod rectangle;
+mod movement;
 
 fn main() {
-    nannou::app(model)
-        .update(update)
-        .run();
-}
-#[derive(Debug)]
-enum Direction {
-    POSITIVE, NEGATIVE
+    nannou::app(model).update(update).run();
 }
 
-#[derive(Debug)]
-struct Rectangle {
-    width: f32,
-    height: f32,
-    x: f32,
-    y: f32,
-    max_x: f32,
-    max_y: f32,
-    direction_x: Direction,
-    direction_y: Direction,
-    color: Hsla<f32>
-}
 
 #[derive(Debug)]
 struct Model {
@@ -96,45 +82,7 @@ fn model(app: &App) -> Model {
 }
 
 fn update(_app: &App, model: &mut Model, _update: Update) {
-    model.rectangles.iter_mut().for_each(|rect| {
-        match rect.direction_x {
-            Direction::POSITIVE => {
-                let mut next_x = rect.x + 1.0;
-                if next_x > rect.max_x {
-                    rect.direction_x = Direction::NEGATIVE;
-                    next_x = rect.max_x + rect.max_x - next_x;
-                }
-                rect.x = next_x;
-            },
-            Direction::NEGATIVE => {
-                let mut next_x = rect.x - 1.0;
-                if next_x < 0.0 {
-                    rect.direction_x = Direction::POSITIVE;
-                    next_x = -1.0 * next_x;
-                }
-                rect.x = next_x;
-            }
-        }
-
-        match &rect.direction_y {
-            Direction::POSITIVE => {
-                let mut next_y = rect.y + 1.5;
-                if next_y > rect.max_y {
-                    rect.direction_y = Direction::NEGATIVE;
-                    next_y = rect.max_y + rect.max_y - next_y;
-                }
-                rect.y = next_y;
-            },
-            Direction::NEGATIVE => {
-                let mut next_y = rect.y - 1.5;
-                if next_y < 0.0 {
-                    rect.direction_y = Direction::POSITIVE;
-                    next_y = -1.0 * next_y;
-                }
-                rect.y = next_y;
-            }
-        }
-    });
+    model.rectangles.iter_mut().for_each(|rect| rect.step());
 }
 
 fn view(app: &App, model: &Model, frame: Frame) -> Frame {
