@@ -1,4 +1,4 @@
-use nannou::prelude::{App, Frame, Update, PURPLE, WindowId, random_range, Hsla};
+use nannou::prelude::{App, Frame, Update, PURPLE, WindowId, random_range};
 use nannou::LoopMode;
 use std::time::Duration;
 use crate::rectangle::{Direction, Rectangle, Move};
@@ -10,11 +10,16 @@ fn main() {
     nannou::app(model).update(update).run();
 }
 
-
 #[derive(Debug)]
 struct Model {
     _window: WindowId,
     rectangles: Vec<Rectangle>
+}
+
+impl Model {
+    fn builder() -> ModelBuilder {
+        ModelBuilder::new()
+    }
 }
 
 struct ModelBuilder {
@@ -27,39 +32,29 @@ impl ModelBuilder {
     fn new() -> ModelBuilder {
         Self { rect_height: None, rect_width: None, number_rects: None }
     }
-    fn with_rect_width(&mut self, width: f32) -> &mut ModelBuilder {
+    fn with_rect_width(mut self, width: f32) -> ModelBuilder {
         self.rect_width = Some(width);
         self
     }
-    fn with_rect_height(&mut self, height: f32) -> &mut ModelBuilder {
+    fn with_rect_height(mut self, height: f32) -> ModelBuilder {
         self.rect_height = Some(height);
         self
     }
-    fn with_number_rects(&mut self, number_rects: u16) -> &mut ModelBuilder {
+    fn with_number_rects(mut self, number_rects: u16) -> ModelBuilder {
         self.number_rects = Some(number_rects);
         self
     }
-    fn build(&mut self, _window: WindowId, app: &App) -> Model {
-        let rect_width = *self.rect_width.get_or_insert(25.0);
-        let rect_height = *self.rect_height.get_or_insert(25.0);
+    fn build(self, _window: WindowId, app: &App) -> Model {
         Model {
             _window,
-            rectangles: (0..*self.number_rects.get_or_insert(5)).map(|x| Rectangle {
-                x: random_range(0.0, app.window_rect().w()),
-                y: random_range(0.0, app.window_rect().h()),
-                max_x: app.window_rect().w() as f32 - rect_width,
-                max_y: app.window_rect().h() as f32 - rect_height,
-                height: rect_height,
-                width: rect_width,
-                direction_x: match x % 4 { 0 | 1 => Direction::POSITIVE, _ => Direction::NEGATIVE},
-                direction_y: match x % 4 { 0 | 2 => Direction::POSITIVE, _ => Direction::NEGATIVE},
-                color: Hsla::new(
-                    random_range(-180.0, 180.0).into(),
-                    1.0,
-                    0.5,
-                    random_range(0.2, 1.0)
-                )
-            }).collect()
+            rectangles: (0..self.number_rects.unwrap_or(5)).map(
+                |count| Rectangle::builder()
+                    .with_x(random_range(0.0, app.window_rect().w()))
+                    .with_y(random_range(0.0, app.window_rect().h()))
+                    .with_x_direction(match count % 4 { 0 | 1 => Direction::POSITIVE, _ => Direction::NEGATIVE})
+                    .with_y_direction(match count % 4 { 0 | 2 => Direction::POSITIVE, _ => Direction::NEGATIVE})
+                    .build(app)
+            ).collect()
         }
     }
 }
@@ -74,10 +69,10 @@ fn model(app: &App) -> Model {
         .build()
         .unwrap();
 
-    ModelBuilder::new()
-        .with_rect_height(20.0)
-        .with_rect_width(20.0)
-        .with_number_rects(160)
+    Model::builder()
+        .with_rect_height(10.0)
+        .with_rect_width(10.0)
+        .with_number_rects(600)
         .build(_window, app)
 }
 
