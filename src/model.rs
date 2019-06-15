@@ -1,6 +1,7 @@
 use nannou::prelude::{WindowId, random_range};
 use nannou::App;
 use crate::rectangle::{Direction, Rectangle};
+use nannou::rand::random;
 
 #[derive(Debug)]
 pub struct Model {
@@ -40,13 +41,13 @@ impl ModelBuilder {
         Model {
             _window,
             rectangles: (0..self.number_rects.unwrap_or(5)).map(
-                |count| Rectangle::builder()
+                |_| Rectangle::builder()
                     .with_height(self.rect_height.unwrap_or(10.0))
                     .with_width(self.rect_width.unwrap_or(10.0))
                     .with_x(random_range(0.0, app.window_rect().w()))
                     .with_y(random_range(0.0, app.window_rect().h()))
-                    .with_x_direction(match count % 4 { 0 | 1 => Direction::POSITIVE, _ => Direction::NEGATIVE})
-                    .with_y_direction(match count % 4 { 0 | 2 => Direction::POSITIVE, _ => Direction::NEGATIVE})
+                    .with_x_direction(if random() { Direction::POSITIVE } else { Direction::NEGATIVE })
+                    .with_y_direction(if random() { Direction::POSITIVE } else { Direction::NEGATIVE })
                     .build(app)
             ).collect()
         }
