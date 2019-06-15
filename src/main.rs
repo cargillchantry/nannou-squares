@@ -1,4 +1,4 @@
-use nannou::prelude::{App, Frame, Update, PURPLE};
+use nannou::prelude::{App, Frame, Update, BLACK};
 use nannou::LoopMode;
 use std::time::Duration;
 use crate::model::Model;
@@ -14,19 +14,19 @@ fn main() {
 
 
 fn model(app: &App) -> Model {
-    app.set_loop_mode(LoopMode::Rate { update_interval: Duration::from_millis(10)});
+    app.set_loop_mode(LoopMode::Rate { update_interval: Duration::from_millis(5)});
     let _window = app
         .new_window()
-        .with_dimensions(620, 520)
+        .with_dimensions(1320, 720)
         .with_title("Chantry's Test")
         .view(view)
         .build()
         .unwrap();
 
     Model::builder()
-        .with_rect_height(10.0)
-        .with_rect_width(10.0)
-        .with_number_rects(600)
+        .with_rect_height(40.0)
+        .with_rect_width(40.0)
+        .with_number_rects(50)
         .build(_window, app)
 }
 
@@ -36,7 +36,7 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
 
 fn view(app: &App, model: &Model, frame: Frame) -> Frame {
     let draw = app.draw();
-    draw.background().color(PURPLE);
+    draw.background().color(BLACK);
     let win = app.window_rect();
     model.rectangles.iter().for_each(|rect| {
         draw.rect()
