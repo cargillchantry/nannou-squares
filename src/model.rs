@@ -38,14 +38,18 @@ impl ModelBuilder {
         self
     }
     pub fn build(self, _window: WindowId, app: &App) -> Model {
+        let rect_width = self.rect_width.unwrap_or(10.0);
+        let rect_height = self.rect_height.unwrap_or(10.0);
+        let bound_x = (app.window_rect().w() - rect_width)/2.0;
+        let bound_y = (app.window_rect().h() - rect_height)/2.0;
         Model {
             _window,
             rectangles: (0..self.number_rects.unwrap_or(5)).map(
                 |_| Rectangle::builder()
-                    .with_height(self.rect_height.unwrap_or(10.0))
-                    .with_width(self.rect_width.unwrap_or(10.0))
-                    .with_x(random_range(0.0, app.window_rect().w()))
-                    .with_y(random_range(0.0, app.window_rect().h()))
+                    .with_width(rect_width)
+                    .with_height(rect_height)
+                    .with_x(random_range(-bound_x, bound_x))
+                    .with_y(random_range(-bound_y, bound_y))
                     .with_x_direction(if random() { Direction::POSITIVE } else { Direction::NEGATIVE })
                     .with_y_direction(if random() { Direction::POSITIVE } else { Direction::NEGATIVE })
                     .build(app)

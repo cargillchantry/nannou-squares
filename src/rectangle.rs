@@ -1,6 +1,7 @@
-pub use crate::movement::{Direction, Move};
+pub use crate::shapes::{Direction, Move, Sketch};
 use nannou::prelude::{Hsla, random_range};
 use nannou::App;
+use nannou::prelude::app::Draw;
 
 pub struct RectangleBuilder {
     width: Option<f32>,
@@ -47,8 +48,8 @@ impl RectangleBuilder {
         Rectangle {
             x: self.x.unwrap_or(0.0),
             y: self.y.unwrap_or(0.0),
-            max_x: app.window_rect().w() as f32 - rect_width,
-            max_y: app.window_rect().h() as f32 - rect_height,
+            max_x: (app.window_rect().w()  - rect_width)/2.0,
+            max_y: (app.window_rect().h()  - rect_height)/2.0,
             height: rect_height,
             width: rect_width,
             direction_x: self.direction_x.unwrap_or(Direction::POSITIVE),
@@ -82,6 +83,17 @@ impl Rectangle {
     }
 }
 
+impl Sketch for Rectangle {
+    fn sketch(&self, draw: &Draw) {
+        draw.rect()
+            .x_y(self.x, self.y)
+            .w(self.width)
+            .h(self.height)
+            .hsv(0.4, 1.0, 1.0)
+            .color(self.color);
+    }
+}
+
 impl Move for Rectangle {
     fn step(&mut self) -> () {
         match self.direction_x {
@@ -95,9 +107,9 @@ impl Move for Rectangle {
             },
             Direction::NEGATIVE => {
                 let mut next_x = self.x - 1.0;
-                if next_x < 0.0 {
+                if next_x < -self.max_x {
                     self.direction_x = Direction::POSITIVE;
-                    next_x = -1.0 * next_x;
+                    next_x = -self.max_x - self.max_x - next_x;
                 }
                 self.x = next_x;
             }
@@ -114,9 +126,9 @@ impl Move for Rectangle {
             },
             Direction::NEGATIVE => {
                 let mut next_y = self.y - 1.5;
-                if next_y < 0.0 {
+                if next_y < -self.max_y {
                     self.direction_y = Direction::POSITIVE;
-                    next_y = -1.0 * next_y;
+                    next_y = -self.max_y - self.max_y - next_y;
                 }
                 self.y = next_y;
             }
